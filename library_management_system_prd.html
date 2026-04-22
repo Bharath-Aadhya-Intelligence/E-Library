@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1814;
+    --ink-2: #3d3a35;
+    --ink-3: #6b6760;
+    --ink-4: #9c9890;
+    --paper: #faf8f4;
+    --paper-2: #f3f0e8;
+    --paper-3: #e8e3d8;
+    --rule: #d4cec2;
+    --accent: #8b2e00;
+    --accent-2: #c04b1a;
+    --accent-pale: #fdf0e8;
+    --teal: #0a5c52;
+    --teal-pale: #e6f4f2;
+    --navy: #1a2d4a;
+    --navy-pale: #eaeff6;
+    --gold: #7a5c00;
+    --gold-pale: #fdf8e6;
+    --violet: #4a1d7a;
+    --violet-pale: #f2ecfd;
+    --serif: 'Playfair Display', Georgia, serif;
+    --body: 'Lora', Georgia, serif;
+    --mono: 'DM Mono', 'Courier New', monospace;
+    --r: 6px;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 64px 56px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.04) 39px,
+      rgba(255,255,255,0.04) 40px
+    );
+    pointer-events: none;
+  }
+  .cover-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent-2);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cover-tag::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent-2);
+  }
+  .cover h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+  .cover h1 span { color: var(--accent-2); }
+  .cover-sub {
+    font-family: var(--body);
+    font-size: 17px;
+    color: rgba(255,255,255,0.55);
+    font-style: italic;
+    margin-bottom: 44px;
+    margin-top: 6px;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* ── LAYOUT ── */
+  .doc {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  /* ── NAV ── */
+  .toc {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    padding: 32px 36px;
+    margin: 48px 0;
+    position: relative;
+  }
+  .toc-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px 24px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 4px 0;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .toc-item:hover { color: var(--accent); border-color: var(--accent); }
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-4);
+    flex-shrink: 0;
+  }
+
+  /* ── SECTIONS ── */
+  .section { margin: 52px 0; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-4);
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .subsection { margin: 28px 0; }
+  .subsection-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+  }
+
+  p { color: var(--ink-2); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+  .badge-admin { background: var(--accent-pale); color: var(--accent); border: 1px solid #f0d0c0; }
+  .badge-student { background: var(--teal-pale); color: var(--teal); border: 1px solid #c0ddd9; }
+  .badge-system { background: var(--navy-pale); color: var(--navy); border: 1px solid #c0cedf; }
+  .badge-warn { background: var(--gold-pale); color: var(--gold); border: 1px solid #e8d8a0; }
+  .badge-method { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .badge-get { background: #e6f4e6; color: #1a6b1a; }
+  .badge-post { background: #fff4e6; color: #8b4a00; }
+  .badge-put { background: #e6ecff; color: #1a3d8b; }
+  .badge-delete { background: #fce6e6; color: #8b1a1a; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    border-radius: var(--r);
+    padding: 18px 22px;
+    margin: 20px 0;
+    border-left: 4px solid;
+    font-size: 14px;
+  }
+  .callout-info { background: var(--navy-pale); border-color: var(--navy); color: var(--navy); }
+  .callout-warn { background: var(--gold-pale); border-color: var(--gold); color: var(--gold); }
+  .callout-success { background: var(--teal-pale); border-color: var(--teal); color: var(--teal); }
+  .callout-accent { background: var(--accent-pale); border-color: var(--accent); color: var(--accent); }
+  .callout-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; font-weight: 500; }
+  .callout p { color: inherit; margin: 0; }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: var(--r); border: 1px solid var(--rule); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--paper-2); }
+  th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding: 12px 16px; text-align: left; font-weight: 500; border-bottom: 1px solid var(--rule); }
+  td { padding: 11px 16px; color: var(--ink-2); border-bottom: 1px solid var(--paper-3); vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(0,0,0,0.015); }
+  td code, th code { font-family: var(--mono); font-size: 12px; background: var(--paper-3); padding: 1px 5px; border-radius: 3px; color: var(--accent); }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: #1e1c18;
+    color: #e8e4dc;
+    border-radius: var(--r);
+    padding: 20px 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .code-block .comment { color: #6b6760; }
+  .code-block .key { color: #8bc4f0; }
+  .code-block .str { color: #a8d8a8; }
+  .code-block .num { color: #f0c48b; }
+  .code-block .kw { color: #d4a0e0; }
+
+  /* ── API ENDPOINT CARDS ── */
+  .endpoint-group { margin: 20px 0; }
+  .endpoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    margin-bottom: 8px;
+    background: var(--paper);
+    transition: border-color 0.2s;
+  }
+  .endpoint:hover { border-color: var(--ink-3); }
+  .endpoint-path {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);
+    flex: 1;
+  }
+  .endpoint-desc {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    margin-top: 3px;
+  }
+  .endpoint-auth {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── USER STORIES ── */
+  .story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+  .story-card {
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    padding: 18px;
+    background: var(--paper);
+  }
+  .story-card-role {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .story-card p { font-size: 13.5px; color: var(--ink-2); margin: 0; }
+  .story-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-4);
+    margin-left: auto;
+  }
+
+  /* ── SCHEMA ── */
+  .schema-block {
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .schema-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .schema-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .schema-coll {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+  }
+  .schema-field {
+    display: grid;
+    grid-template-columns: 1fr 100px 80px 1fr;
+    gap: 0;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--paper-3);
+    font-size: 13px;
+    align-items: center;
+  }
+  .schema-field:last-child { border-bottom: none; }
+  .schema-field:nth-child(even) { background: var(--paper-2); }
+  .field-name { font-family: var(--mono); font-size: 12.5px; color: var(--accent); }
+  .field-type { font-family: var(--mono); font-size: 11px; color: var(--navy); }
+  .field-constraint { font-family: var(--mono); font-size: 10px; color: var(--teal); }
+  .field-desc { font-size: 12px; color: var(--ink-3); }
+
+  /* ── FLOW STEPS ── */
+  .flow-steps { margin: 20px 0; }
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 0;
+    position: relative;
+  }
+  .flow-step::before {
+    content: '';
+    position: absolute;
+    left: 18px;
+    top: 40px;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+  .flow-step:last-child::before { display: none; }
+  .flow-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .flow-step-body { padding-bottom: 24px; flex: 1; }
+  .flow-step-title { font-family: var(--serif); font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .flow-step p { font-size: 13.5px; color: var(--ink-3); margin: 0; }
+
+  /* ── COMPONENT GRID ── */
+  .component-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+  .component-card {
+    border: 1px solid var(--rule);
+    border-radius: var(--r);
+    padding: 16px;
+    background: var(--paper);
+  }
+  .component-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .component-name { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .component-desc { font-size: 12px; color: var(--ink-3); }
+
+  /* ── RISK TABLE ── */
+  .risk-high td:first-child { border-left: 3px solid #c01a1a; }
+  .risk-med td:first-child { border-left: 3px solid #c07800; }
+  .risk-low td:first-child { border-left: 3px solid #1a8b1a; }
+
+  /* ── TIMELINE ── */
+  .timeline { margin: 20px 0; }
+  .timeline-phase {
+    display: flex;
+    gap: 0;
+    margin-bottom: 12px;
+  }
+  .timeline-label {
+    width: 100px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    flex-shrink: 0;
+    padding-top: 10px;
+    text-align: right;
+    padding-right: 16px;
+  }
+  .timeline-bar-wrap { flex: 1; }
+  .timeline-bar {
+    height: 36px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .timeline-tasks { font-size: 12px; color: var(--ink-3); padding-left: 4px; }
+  .ph-1 { background: var(--accent-pale); color: var(--accent); border: 1px solid #f0d0c0; }
+  .ph-2 { background: var(--navy-pale); color: var(--navy); border: 1px solid #c0cedf; }
+  .ph-3 { background: var(--teal-pale); color: var(--teal); border: 1px solid #c0ddd9; }
+  .ph-4 { background: var(--violet-pale); color: var(--violet); border: 1px solid #d8c8f5; }
+  .ph-5 { background: var(--gold-pale); color: var(--gold); border: 1px solid #e8d8a0; }
+
+  /* ── METRIC CARDS ── */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 20px 0; }
+  .metric {
+    background: var(--paper-2);
+    border-radius: var(--r);
+    padding: 16px;
+    text-align: center;
+  }
+  .metric-val { font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--ink); }
+  .metric-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-top: 4px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 2px solid var(--ink);
+    margin-top: 64px;
+    padding: 32px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-4);
+    background: var(--paper-2);
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 600px) {
+    .cover { padding: 40px 24px 36px; }
+    .doc { padding: 0 16px 60px; }
+    .schema-field { grid-template-columns: 1fr 80px; }
+    .schema-field .field-constraint, .schema-field .field-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════╗ -->
+<!--   COVER                               -->
+<!-- ╚══════════════════════════════════════╝ -->
+<div class="cover">
+  <div class="cover-tag">Product Requirements Document · v1.0</div>
+  <h1>Library <span>Management</span><br>System</h1>
+  <p class="cover-sub">Full-stack platform for academic book issuance, returns & student lifecycle</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><label>Status</label><span>Ready for Development</span></div>
+    <div class="cover-meta-item"><label>Version</label><span>1.0.0</span></div>
+    <div class="cover-meta-item"><label>Stack</label><span>FastAPI · React · MongoDB</span></div>
+    <div class="cover-meta-item"><label>Target Release</label><span>Q3 2025</span></div>
+    <div class="cover-meta-item"><label>Auth</label><span>JWT · bcrypt</span></div>
+    <div class="cover-meta-item"><label>Document Type</label><span>Engineering PRD</span></div>
+  </div>
+</div>
+
+<div class="doc">
+
+<!-- ╔══════════════════════════════════════╗ -->
+<!--   TOC                                 -->
+<!-- ╚══════════════════════════════════════╝ -->
+<div class="toc">
+  <div class="toc-label">Table of Contents</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s1"><span class="toc-num">01</span> Executive Summary</a>
+    <a class="toc-item" href="#s2"><span class="toc-num">02</span> Goals & Success Metrics</a>
+    <a class="toc-item" href="#s3"><span class="toc-num">03</span> Roles & Permissions</a>
+    <a class="toc-item" href="#s4"><span class="toc-num">04</span> User Stories</a>
+    <a class="toc-item" href="#s5"><span class="toc-num">05</span> System Architecture</a>
+    <a class="toc-item" href="#s6"><span class="toc-num">06</span> Database Schema</a>
+    <a class="toc-item" href="#s7"><span class="toc-num">07</span> API Specification</a>
+    <a class="toc-item" href="#s8"><span class="toc-num">08</span> Authentication</a>
+    <a class="toc-item" href="#s9"><span class="toc-num">09</span> Frontend Specification</a>
+    <a class="toc-item" href="#s10"><span class="toc-num">10</span> Business Logic</a>
+    <a class="toc-item" href="#s11"><span class="toc-num">11</span> Security</a>
+    <a class="toc-item" href="#s12"><span class="toc-num">12</span> Non-Functional Requirements</a>
+    <a class="toc-item" href="#s13"><span class="toc-num">13</span> Risks & Mitigations</a>
+    <a class="toc-item" href="#s14"><span class="toc-num">14</span> Implementation Roadmap</a>
+  </div>
+</div>
+
+<!-- ── 01 ── -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Executive Summary</h2>
+  </div>
+  <p>The Library Management System (LMS) is a web-based application designed to digitise and streamline the operation of an academic institution's library. The platform replaces manual, paper-based processes with a secure, role-driven digital workflow that covers the complete lifecycle of book issuance and return.</p>
+  <p>The system serves two distinct user roles — <strong>Administrators</strong> and <strong>Students</strong> — each with a tailored interface and strictly enforced permission boundary. Administrators control the entire inventory and transaction workflow; students register and may view their own borrowing history.</p>
+  <p>The technical foundation is a modern, async Python backend (FastAPI + Motor/MongoDB) paired with a React single-page application built on Vite. All communication is stateless and secured via JSON Web Tokens, with passwords hashed using bcrypt via passlib.</p>
+
+  <div class="callout callout-info">
+    <div class="callout-title">Scope</div>
+    <p>This PRD covers the first production release (v1.0). Features such as email notifications, reservation queues, barcode scanning, and mobile apps are scoped to future iterations.</p>
+  </div>
+</div>
+
+<!-- ── 02 ── -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Goals &amp; Success Metrics</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Primary Goals</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Goal</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td><code>G-01</code></td><td>Eliminate paper-based issue/return logs</td><td>Reduce errors, speed reconciliation</td></tr>
+          <tr><td><code>G-02</code></td><td>Provide real-time book availability</td><td>Students and admins need accurate stock</td></tr>
+          <tr><td><code>G-03</code></td><td>Automate fine calculation on overdue returns</td><td>Consistent policy enforcement</td></tr>
+          <tr><td><code>G-04</code></td><td>Centralise student records in MongoDB</td><td>Single source of truth for identity</td></tr>
+          <tr><td><code>G-05</code></td><td>Secure, role-based access control</td><td>Prevent unauthorised admin actions</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Key Performance Indicators</h3>
+    <div class="metrics">
+      <div class="metric"><div class="metric-val">&lt;200ms</div><div class="metric-label">API P95 Latency</div></div>
+      <div class="metric"><div class="metric-val">99.5%</div><div class="metric-label">API Uptime</div></div>
+      <div class="metric"><div class="metric-val">₹5/day</div><div class="metric-label">Fine Rate</div></div>
+      <div class="metric"><div class="metric-val">7 days</div><div class="metric-label">Default Loan Period</div></div>
+      <div class="metric"><div class="metric-val">0</div><div class="metric-label">Plaintext passwords</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 03 ── -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Roles &amp; Permissions</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Admin</th>
+          <th>Student</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Login</td><td>✓</td><td>✓</td></tr>
+        <tr><td>Self-register</td><td>✗ (seeded)</td><td>✓</td></tr>
+        <tr><td>View dashboard stats</td><td>✓</td><td>✗</td></tr>
+        <tr><td>Add / Edit / Delete books</td><td>✓</td><td>✗</td></tr>
+        <tr><td>View book catalogue</td><td>✓</td><td>✓ (read-only)</td></tr>
+        <tr><td>Search books</td><td>✓</td><td>✓</td></tr>
+        <tr><td>List all students</td><td>✓</td><td>✗</td></tr>
+        <tr><td>Search student by studentId</td><td>✓</td><td>✗</td></tr>
+        <tr><td>Edit / Deactivate students</td><td>✓</td><td>✗</td></tr>
+        <tr><td>Issue book to a student</td><td>✓</td><td>✗</td></tr>
+        <tr><td>Process return &amp; calculate fine</td><td>✓</td><td>✗</td></tr>
+        <tr><td>View all transactions</td><td>✓</td><td>Own only</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">Admin Seeding</div>
+    <p>The initial admin account is seeded via an environment variable or a one-time CLI script run at deployment. The <code>/api/auth/register</code> endpoint must never create a user with <code>role: "admin"</code>.</p>
+  </div>
+</div>
+
+<!-- ── 04 ── -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">User Stories</h2>
+  </div>
+
+  <div class="story-grid">
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-01</span></div>
+      <p>As an admin, I can log in with my email and password so that I can access the management dashboard securely.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-student">Student</span><span class="story-id">US-02</span></div>
+      <p>As a student, I can register with my name, email, password, phone, course, and year so that a library account is created automatically.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-student">Student</span><span class="story-id">US-03</span></div>
+      <p>As a student, I receive a unique studentId upon registration so that admins can identify me quickly.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-04</span></div>
+      <p>As an admin, I can search for a student by their studentId so that I can verify their identity before issuing a book.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-05</span></div>
+      <p>As an admin, I can issue a book to a student, reducing available copies and recording the transaction with a 7-day due date.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-06</span></div>
+      <p>As an admin, I can mark a book as returned, triggering automatic fine calculation (₹5/day overdue) and restoring stock.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-07</span></div>
+      <p>As an admin, I can add, edit, and delete books in the catalogue so that the inventory stays current.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-admin">Admin</span><span class="story-id">US-08</span></div>
+      <p>As an admin, I can view a dashboard showing total books, issued books, overdue count, student count, and accrued fines.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-system">System</span><span class="story-id">US-09</span></div>
+      <p>The system prevents issuing a book when <code>availableCopies</code> is 0, returning a meaningful error to the admin.</p>
+    </div>
+    <div class="story-card">
+      <div class="story-card-role"><span class="badge badge-system">System</span><span class="story-id">US-10</span></div>
+      <p>The system rejects any request without a valid JWT or with a role mismatch, returning HTTP 401/403.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── 05 ── -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">System Architecture</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">High-Level Stack</h3>
+    <div class="component-grid">
+      <div class="component-card">
+        <div class="component-icon">⚡</div>
+        <div class="component-name">FastAPI</div>
+        <div class="component-desc">Async Python backend; OpenAPI docs auto-generated</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">⚙️</div>
+        <div class="component-name">Motor</div>
+        <div class="component-desc">Async MongoDB driver for non-blocking DB I/O</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">🍃</div>
+        <div class="component-name">MongoDB</div>
+        <div class="component-desc">Document store; 3 collections: users, books, transactions</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">⚛️</div>
+        <div class="component-name">React + Vite</div>
+        <div class="component-desc">SPA frontend; fast HMR during development</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">🔑</div>
+        <div class="component-name">JWT</div>
+        <div class="component-desc">Stateless auth; payload carries user_id + role</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">🔐</div>
+        <div class="component-name">passlib/bcrypt</div>
+        <div class="component-desc">Password hashing with work factor ≥ 12</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">🌐</div>
+        <div class="component-name">Axios</div>
+        <div class="component-desc">HTTP client; auto-injects JWT from localStorage</div>
+      </div>
+      <div class="component-card">
+        <div class="component-icon">📦</div>
+        <div class="component-name">python-dotenv</div>
+        <div class="component-desc">Environment variable management for secrets</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Backend Project Structure</h3>
+    <div class="code-block">
+<span class="comment"># /app directory layout</span>
+app/
+├── main.py                  <span class="comment"># FastAPI app, CORS, router mounting</span>
+├── core/
+│   ├── config.py            <span class="comment"># Settings via pydantic BaseSettings</span>
+│   ├── security.py          <span class="comment"># JWT encode/decode, password hash</span>
+│   └── dependencies.py      <span class="comment"># get_current_user, admin_only deps</span>
+├── db/
+│   └── mongodb.py           <span class="comment"># Motor client, db instance</span>
+├── models/                  <span class="comment"># MongoDB document shapes (dicts)</span>
+├── schemas/                 <span class="comment"># Pydantic request/response models</span>
+│   ├── user.py
+│   ├── book.py
+│   └── transaction.py
+├── controllers/             <span class="comment"># Business logic functions</span>
+│   ├── auth.py
+│   ├── books.py
+│   ├── students.py
+│   ├── transactions.py
+│   └── dashboard.py
+└── routes/                  <span class="comment"># FastAPI APIRouter instances</span>
+    ├── auth.py
+    ├── books.py
+    ├── students.py
+    ├── transactions.py
+    └── dashboard.py</div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Frontend Project Structure</h3>
+    <div class="code-block">
+src/
+├── main.jsx
+├── App.jsx                  <span class="comment"># Router + protected route wrappers</span>
+├── services/
+│   └── api.js               <span class="comment"># Axios instance, JWT interceptor</span>
+├── utils/
+│   └── auth.js              <span class="comment"># getToken, getRole, logout</span>
+├── components/
+│   ├── Sidebar.jsx
+│   ├── ProtectedRoute.jsx
+│   ├── AdminRoute.jsx
+│   └── ui/                  <span class="comment"># Reusable UI atoms</span>
+└── pages/
+    ├── Login.jsx
+    ├── Register.jsx
+    ├── Dashboard.jsx         <span class="comment"># Admin only</span>
+    ├── Books.jsx             <span class="comment"># Admin only</span>
+    ├── Students.jsx          <span class="comment"># Admin only</span>
+    ├── IssueBook.jsx         <span class="comment"># Admin only</span>
+    └── ReturnBook.jsx        <span class="comment"># Admin only</span></div>
+  </div>
+</div>
+
+<!-- ── 06 ── -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Database Schema</h2>
+  </div>
+
+  <!-- Users -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-name">User</span>
+      <span class="schema-coll">collection: users</span>
+    </div>
+    <div class="schema-field" style="background:var(--paper-2);font-family:var(--mono);font-size:11px;color:var(--ink-4);border-bottom:1px solid var(--rule);">
+      <span>Field</span><span>Type</span><span>Constraint</span><span>Notes</span>
+    </div>
+    <div class="schema-field"><span class="field-name">_id</span><span class="field-type">ObjectId</span><span class="field-constraint">PK, auto</span><span class="field-desc">MongoDB primary key</span></div>
+    <div class="schema-field"><span class="field-name">name</span><span class="field-type">String</span><span class="field-constraint">required</span><span class="field-desc">Full display name</span></div>
+    <div class="schema-field"><span class="field-name">email</span><span class="field-type">String</span><span class="field-constraint">unique, req</span><span class="field-desc">Login credential</span></div>
+    <div class="schema-field"><span class="field-name">password</span><span class="field-type">String</span><span class="field-constraint">required</span><span class="field-desc">bcrypt hash; never plaintext</span></div>
+    <div class="schema-field"><span class="field-name">role</span><span class="field-type">Enum</span><span class="field-constraint">required</span><span class="field-desc">"admin" | "student"</span></div>
+    <div class="schema-field"><span class="field-name">studentId</span><span class="field-type">String</span><span class="field-constraint">unique, auto</span><span class="field-desc">e.g. "STU-0042"; null for admin</span></div>
+    <div class="schema-field"><span class="field-name">phone</span><span class="field-type">String</span><span class="field-constraint">optional</span><span class="field-desc">Contact number</span></div>
+    <div class="schema-field"><span class="field-name">course</span><span class="field-type">String</span><span class="field-constraint">optional</span><span class="field-desc">e.g. "B.Tech CS"</span></div>
+    <div class="schema-field"><span class="field-name">year</span><span class="field-type">Integer</span><span class="field-constraint">optional</span><span class="field-desc">Academic year 1–5</span></div>
+    <div class="schema-field"><span class="field-name">active</span><span class="field-type">Boolean</span><span class="field-constraint">default: true</span><span class="field-desc">Soft-delete flag</span></div>
+    <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">DateTime</span><span class="field-constraint">auto</span><span class="field-desc">UTC ISO timestamp</span></div>
+  </div>
+
+  <!-- Books -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-name">Book</span>
+      <span class="schema-coll">collection: books</span>
+    </div>
+    <div class="schema-field" style="background:var(--paper-2);font-family:var(--mono);font-size:11px;color:var(--ink-4);border-bottom:1px solid var(--rule);">
+      <span>Field</span><span>Type</span><span>Constraint</span><span>Notes</span>
+    </div>
+    <div class="schema-field"><span class="field-name">_id</span><span class="field-type">ObjectId</span><span class="field-constraint">PK, auto</span><span class="field-desc">MongoDB primary key</span></div>
+    <div class="schema-field"><span class="field-name">title</span><span class="field-type">String</span><span class="field-constraint">required</span><span class="field-desc">Full book title</span></div>
+    <div class="schema-field"><span class="field-name">author</span><span class="field-type">String</span><span class="field-constraint">required</span><span class="field-desc">Primary author name</span></div>
+    <div class="schema-field"><span class="field-name">category</span><span class="field-type">String</span><span class="field-constraint">optional</span><span class="field-desc">e.g. "Computer Science"</span></div>
+    <div class="schema-field"><span class="field-name">isbn</span><span class="field-type">String</span><span class="field-constraint">unique</span><span class="field-desc">ISBN-13 preferred</span></div>
+    <div class="schema-field"><span class="field-name">totalCopies</span><span class="field-type">Integer</span><span class="field-constraint">min: 1</span><span class="field-desc">Physical stock count</span></div>
+    <div class="schema-field"><span class="field-name">availableCopies</span><span class="field-type">Integer</span><span class="field-constraint">min: 0</span><span class="field-desc">Decremented on issue; ≤ totalCopies</span></div>
+    <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">DateTime</span><span class="field-constraint">auto</span><span class="field-desc">UTC ISO timestamp</span></div>
+  </div>
+
+  <!-- Transactions -->
+  <div class="schema-block">
+    <div class="schema-header">
+      <span class="schema-name">Transaction</span>
+      <span class="schema-coll">collection: transactions</span>
+    </div>
+    <div class="schema-field" style="background:var(--paper-2);font-family:var(--mono);font-size:11px;color:var(--ink-4);border-bottom:1px solid var(--rule);">
+      <span>Field</span><span>Type</span><span>Constraint</span><span>Notes</span>
+    </div>
+    <div class="schema-field"><span class="field-name">_id</span><span class="field-type">ObjectId</span><span class="field-constraint">PK, auto</span><span class="field-desc">MongoDB primary key</span></div>
+    <div class="schema-field"><span class="field-name">studentId</span><span class="field-type">ObjectId</span><span class="field-constraint">ref: users</span><span class="field-desc">Foreign key to user</span></div>
+    <div class="schema-field"><span class="field-name">bookId</span><span class="field-type">ObjectId</span><span class="field-constraint">ref: books</span><span class="field-desc">Foreign key to book</span></div>
+    <div class="schema-field"><span class="field-name">issueDate</span><span class="field-type">DateTime</span><span class="field-constraint">auto</span><span class="field-desc">UTC timestamp at issue</span></div>
+    <div class="schema-field"><span class="field-name">dueDate</span><span class="field-type">DateTime</span><span class="field-constraint">auto</span><span class="field-desc">issueDate + 7 days</span></div>
+    <div class="schema-field"><span class="field-name">returnDate</span><span class="field-type">DateTime</span><span class="field-constraint">nullable</span><span class="field-desc">Set on return; null if outstanding</span></div>
+    <div class="schema-field"><span class="field-name">fine</span><span class="field-type">Float</span><span class="field-constraint">default: 0</span><span class="field-desc">Calculated on return; 0 if on time</span></div>
+    <div class="schema-field"><span class="field-name">status</span><span class="field-type">Enum</span><span class="field-constraint">required</span><span class="field-desc">"ISSUED" | "RETURNED"</span></div>
+  </div>
+
+  <div class="callout callout-success">
+    <div class="callout-title">Indexes</div>
+    <p>Create the following MongoDB indexes at startup: <code>users.email</code> (unique), <code>users.studentId</code> (unique, sparse), <code>books.isbn</code> (unique), <code>transactions.studentId</code>, <code>transactions.status</code>, <code>transactions.dueDate</code>.</p>
+  </div>
+</div>
+
+<!-- ── 07 ── -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">API Specification</h2>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-title">Base URL</div>
+    <p>All endpoints are prefixed with <code>/api</code>. The server runs on <code>http://localhost:8000</code> by default. All responses are JSON. All datetimes are ISO 8601 UTC.</p>
+  </div>
+
+  <!-- Auth -->
+  <div class="subsection">
+    <h3 class="subsection-title">Authentication — /api/auth</h3>
+    <div class="endpoint-group">
+      <div class="endpoint">
+        <div class="endpoint-auth"><span class="badge badge-method badge-post">POST</span></div>
+        <div>
+          <div class="endpoint-path">/api/auth/register</div>
+          <div class="endpoint-desc">Register a new student account. Auto-generates <code>studentId</code>. Returns <code>201</code> with user object (no password). Never accepts <code>role: "admin"</code>.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-auth"><span class="badge badge-method badge-post">POST</span></div>
+        <div>
+          <div class="endpoint-path">/api/auth/login</div>
+          <div class="endpoint-desc">Login for admin or student. Returns <code>{ "access_token": "...", "token_type": "bearer", "role": "..." }</code>. 401 on invalid credentials.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Books -->
+  <div class="subsection">
+    <h3 class="subsection-title">Books — /api/books &nbsp;<span class="badge badge-admin">Admin Only</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint">
+        <span class="badge badge-method badge-get">GET</span>
+        <div>
+          <div class="endpoint-path">/api/books</div>
+          <div class="endpoint-desc">List all books. Supports <code>?title=</code> and <code>?author=</code> query params for case-insensitive partial search (MongoDB <code>$regex</code>).</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-post">POST</span>
+        <div>
+          <div class="endpoint-path">/api/books</div>
+          <div class="endpoint-desc">Create a new book. <code>availableCopies</code> is set equal to <code>totalCopies</code> on creation. Returns <code>201</code>.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-put">PUT</span>
+        <div>
+          <div class="endpoint-path">/api/books/{id}</div>
+          <div class="endpoint-desc">Update book metadata or copy counts. Validate that <code>availableCopies</code> ≤ <code>totalCopies</code> after update.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-delete">DELETE</span>
+        <div>
+          <div class="endpoint-path">/api/books/{id}</div>
+          <div class="endpoint-desc">Soft-delete or hard-delete a book. Return <code>409 Conflict</code> if active transactions exist.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students -->
+  <div class="subsection">
+    <h3 class="subsection-title">Students — /api/students &nbsp;<span class="badge badge-admin">Admin Only</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint">
+        <span class="badge badge-method badge-get">GET</span>
+        <div>
+          <div class="endpoint-path">/api/students</div>
+          <div class="endpoint-desc">List all active students (role = "student"). Passwords excluded from response.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-get">GET</span>
+        <div>
+          <div class="endpoint-path">/api/students/search/{studentId}</div>
+          <div class="endpoint-desc">Look up a student by their <code>studentId</code> string (e.g. "STU-0042"). Used in the Issue Book flow.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-put">PUT</span>
+        <div>
+          <div class="endpoint-path">/api/students/{id}</div>
+          <div class="endpoint-desc">Update student profile fields (name, phone, course, year, active). Email and role are immutable after creation.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-delete">DELETE</span>
+        <div>
+          <div class="endpoint-path">/api/students/{id}</div>
+          <div class="endpoint-desc">Soft-delete (set <code>active: false</code>). Return <code>409</code> if student has unreturned books.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions -->
+  <div class="subsection">
+    <h3 class="subsection-title">Transactions — /api/transactions &nbsp;<span class="badge badge-admin">Admin Only</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint">
+        <span class="badge badge-method badge-post">POST</span>
+        <div>
+          <div class="endpoint-path">/api/transactions/issue</div>
+          <div class="endpoint-desc">Issue a book. Body: <code>{ studentId, bookId }</code>. Validates student is active, book has <code>availableCopies &gt; 0</code>, and student has no more than 3 active issues (configurable). Atomically decrements stock and creates transaction.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-post">POST</span>
+        <div>
+          <div class="endpoint-path">/api/transactions/return</div>
+          <div class="endpoint-desc">Process return. Body: <code>{ transactionId }</code>. Sets <code>returnDate</code>, calculates fine, increments <code>availableCopies</code>, sets <code>status: "RETURNED"</code>. Returns fine amount in response.</div>
+        </div>
+      </div>
+      <div class="endpoint">
+        <span class="badge badge-method badge-get">GET</span>
+        <div>
+          <div class="endpoint-path">/api/transactions</div>
+          <div class="endpoint-desc">List all transactions with joined student name, book title. Supports <code>?status=ISSUED</code> filter. Paginated (<code>?page=1&limit=20</code>).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="subsection">
+    <h3 class="subsection-title">Dashboard — /api/dashboard &nbsp;<span class="badge badge-admin">Admin Only</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint">
+        <span class="badge badge-method badge-get">GET</span>
+        <div>
+          <div class="endpoint-path">/api/dashboard/stats</div>
+          <div class="endpoint-desc">Single aggregated response via MongoDB aggregation pipeline. Returns: <code>totalBooks</code>, <code>totalStudents</code>, <code>issuedBooks</code>, <code>overdueBooks</code>, <code>totalFine</code>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error schema -->
+  <div class="subsection">
+    <h3 class="subsection-title">Standard Error Response</h3>
+    <div class="code-block">
+{
+  <span class="key">"detail"</span>: <span class="str">"Book not available. All copies are currently issued."</span>,
+  <span class="key">"status_code"</span>: <span class="num">409</span>
+}</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Status</th><th>When Used</th></tr></thead>
+        <tbody>
+          <tr><td><code>400</code> Bad Request</td><td>Pydantic validation failure</td></tr>
+          <tr><td><code>401</code> Unauthorized</td><td>Missing or invalid JWT</td></tr>
+          <tr><td><code>403</code> Forbidden</td><td>Valid JWT but insufficient role</td></tr>
+          <tr><td><code>404</code> Not Found</td><td>Resource does not exist</td></tr>
+          <tr><td><code>409</code> Conflict</td><td>Business rule violation (no stock, outstanding books)</td></tr>
+          <tr><td><code>422</code> Unprocessable</td><td>Pydantic schema mismatch (FastAPI default)</td></tr>
+          <tr><td><code>500</code> Internal Error</td><td>Unexpected server exception</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── 08 ── -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Authentication System</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">JWT Token Structure</h3>
+    <div class="code-block">
+<span class="comment"># Header</span>
+{ <span class="key">"alg"</span>: <span class="str">"HS256"</span>, <span class="key">"typ"</span>: <span class="str">"JWT"</span> }
+
+<span class="comment"># Payload</span>
+{
+  <span class="key">"sub"</span>: <span class="str">"&lt;user_id_string&gt;"</span>,   <span class="comment"># MongoDB ObjectId as str</span>
+  <span class="key">"role"</span>: <span class="str">"admin"</span>,           <span class="comment"># or "student"</span>
+  <span class="key">"exp"</span>: <span class="num">1719000000</span>          <span class="comment"># Unix timestamp, 24h default</span>
+}
+
+<span class="comment"># Signed with: SECRET_KEY from .env (min 32 chars, random)</span></div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">FastAPI Dependencies</h3>
+    <div class="code-block">
+<span class="kw">async def</span> <span class="key">get_current_user</span>(token: str = Depends(oauth2_scheme)):
+    <span class="comment"># 1. Decode JWT → payload</span>
+    <span class="comment"># 2. Fetch user from DB by payload["sub"]</span>
+    <span class="comment"># 3. Return user doc or raise HTTP 401</span>
+    ...
+
+<span class="kw">async def</span> <span class="key">admin_only</span>(user = Depends(get_current_user)):
+    <span class="kw">if</span> user[<span class="str">"role"</span>] != <span class="str">"admin"</span>:
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">403</span>,
+                            detail=<span class="str">"Admin access required"</span>)
+    <span class="kw">return</span> user</div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Password Hashing</h3>
+    <div class="code-block">
+<span class="kw">from</span> passlib.context <span class="kw">import</span> CryptContext
+
+pwd_context = CryptContext(schemes=[<span class="str">"bcrypt"</span>], deprecated=<span class="str">"auto"</span>)
+
+<span class="kw">def</span> <span class="key">hash_password</span>(plain: str) -> str:
+    <span class="kw">return</span> pwd_context.hash(plain)
+
+<span class="kw">def</span> <span class="key">verify_password</span>(plain: str, hashed: str) -> bool:
+    <span class="kw">return</span> pwd_context.verify(plain, hashed)</div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Frontend JWT Storage &amp; Injection</h3>
+    <div class="code-block">
+<span class="comment">// services/api.js</span>
+<span class="kw">import</span> axios <span class="kw">from</span> <span class="str">"axios"</span>;
+
+<span class="kw">const</span> api = axios.create({ baseURL: <span class="str">"http://localhost:8000/api"</span> });
+
+api.interceptors.request.use(config => {
+  <span class="kw">const</span> token = localStorage.getItem(<span class="str">"lms_token"</span>);
+  <span class="kw">if</span> (token) config.headers.Authorization = <span class="str">`Bearer ${token}`</span>;
+  <span class="kw">return</span> config;
+});
+
+api.interceptors.response.use(
+  res => res,
+  err => {
+    <span class="kw">if</span> (err.response?.status === <span class="num">401</span>) {
+      localStorage.clear();
+      window.location.href = <span class="str">"/login"</span>;
+    }
+    <span class="kw">return</span> Promise.reject(err);
+  }
+);
+
+<span class="kw">export default</span> api;</div>
+  </div>
+</div>
+
+<!-- ── 09 ── -->
+<div class="section" id="s9">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Frontend Specification</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Page Inventory</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Route</th><th>Component</th><th>Access</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>/login</code></td><td>Login.jsx</td><td>Public</td><td>Email + password form; redirects based on role after login</td></tr>
+          <tr><td><code>/register</code></td><td>Register.jsx</td><td>Public</td><td>Student self-registration; 6 fields</td></tr>
+          <tr><td><code>/dashboard</code></td><td>Dashboard.jsx</td><td>Admin</td><td>5 stat cards pulled from <code>/api/dashboard/stats</code></td></tr>
+          <tr><td><code>/books</code></td><td>Books.jsx</td><td>Admin</td><td>Book list, add/edit/delete, search bar</td></tr>
+          <tr><td><code>/students</code></td><td>Students.jsx</td><td>Admin</td><td>Student list, search by studentId, edit/deactivate</td></tr>
+          <tr><td><code>/issue</code></td><td>IssueBook.jsx</td><td>Admin</td><td>Issue flow: search student → display info → select book → confirm</td></tr>
+          <tr><td><code>/return</code></td><td>ReturnBook.jsx</td><td>Admin</td><td>List ISSUED transactions; click return; show fine modal</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Issue Book Flow (Critical)</h3>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Enter Student ID</div>
+          <p>Admin types the studentId (e.g. "STU-0042") into an input field and clicks Search.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Display Student Card</div>
+          <p>Call <code>GET /api/students/search/{studentId}</code>. Render student name, course, year, and current active-issue count as a read-only card.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Select Book</div>
+          <p>Admin picks from a searchable dropdown populated from <code>GET /api/books</code>, filtered to <code>availableCopies &gt; 0</code>.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Confirm Issue</div>
+          <p>Admin clicks "Issue Book". Display a confirmation modal showing student name, book title, and due date (today + 7 days).</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">5</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Submit &amp; Feedback</div>
+          <p>Call <code>POST /api/transactions/issue</code>. On success, show a success toast. On error (no copies, inactive student), show the API error message inline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Route Protection Pattern</h3>
+    <div class="code-block">
+<span class="comment">// ProtectedRoute — requires any valid JWT</span>
+<span class="kw">const</span> ProtectedRoute = ({ children }) => {
+  <span class="kw">const</span> token = localStorage.getItem(<span class="str">"lms_token"</span>);
+  <span class="kw">return</span> token ? children : &lt;Navigate to=<span class="str">"/login"</span> replace /&gt;;
+};
+
+<span class="comment">// AdminRoute — requires role === "admin"</span>
+<span class="kw">const</span> AdminRoute = ({ children }) => {
+  <span class="kw">const</span> role = localStorage.getItem(<span class="str">"lms_role"</span>);
+  <span class="kw">return</span> role === <span class="str">"admin"</span> ? children : &lt;Navigate to=<span class="str">"/login"</span> replace /&gt;;
+};</div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">UI Component Requirements</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>Behaviour</th></tr></thead>
+        <tbody>
+          <tr><td>Sidebar</td><td>Persistent left nav with role-aware links; active item highlighted; hamburger collapse on mobile</td></tr>
+          <tr><td>Stat Cards</td><td>Dashboard grid of 5 cards; each shows icon, label, value; skeleton loading state</td></tr>
+          <tr><td>Book Table</td><td>Sortable columns; inline edit/delete actions; search debounced at 300ms</td></tr>
+          <tr><td>Student Table</td><td>Paginated list; badge for active/inactive; search by studentId in header</td></tr>
+          <tr><td>Fine Modal</td><td>Shows on return completion; displays days overdue + fine amount; confirm dismiss</td></tr>
+          <tr><td>Toast</td><td>Success (green) and error (red) toasts; auto-dismiss after 3s</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── 10 ── -->
+<div class="section" id="s10">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Business Logic</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Student ID Generation</h3>
+    <p>On registration, the backend queries the users collection for the count of existing students, then formats: <code>STU-{count+1:04d}</code> (e.g. "STU-0001", "STU-0042"). A unique index on <code>studentId</code> ensures race conditions are caught by MongoDB.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Issue Validation Rules</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Check</th><th>Failure Response</th></tr></thead>
+        <tbody>
+          <tr><td>Student exists and <code>active: true</code></td><td>404 / 409 — "Student account is inactive"</td></tr>
+          <tr><td><code>availableCopies &gt; 0</code></td><td>409 — "No copies available"</td></tr>
+          <tr><td>Student has fewer than 3 active issues</td><td>409 — "Borrow limit reached"</td></tr>
+          <tr><td>Student does not already have this book issued</td><td>409 — "Book already issued to student"</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Fine Calculation</h3>
+    <div class="code-block">
+<span class="comment"># On return</span>
+days_late = max(<span class="num">0</span>, (return_date - due_date).days)
+fine = days_late * <span class="num">5</span>   <span class="comment"># ₹5 per day overdue
+
+# fine is stored on the transaction record
+# fine of 0 means returned on time or early</span></div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Dashboard Aggregation</h3>
+    <div class="code-block">
+<span class="comment"># Single MongoDB aggregation pipeline</span>
+[
+  { <span class="str">"$facet"</span>: {
+    <span class="str">"totalBooks"</span>:    [{ <span class="str">"$count"</span>: <span class="str">"n"</span> }],   <span class="comment"># books collection</span>
+    <span class="str">"totalStudents"</span>: [                         <span class="comment"># users collection</span>
+      { <span class="str">"$match"</span>: { <span class="str">"role"</span>: <span class="str">"student"</span>, <span class="str">"active"</span>: <span class="kw">True</span> } },
+      { <span class="str">"$count"</span>: <span class="str">"n"</span> }
+    ],
+    <span class="str">"issuedBooks"</span>:   [                         <span class="comment"># transactions collection</span>
+      { <span class="str">"$match"</span>: { <span class="str">"status"</span>: <span class="str">"ISSUED"</span> } },
+      { <span class="str">"$count"</span>: <span class="str">"n"</span> }
+    ],
+    <span class="str">"overdueBooks"</span>:  [
+      { <span class="str">"$match"</span>: { <span class="str">"status"</span>: <span class="str">"ISSUED"</span>,
+                   <span class="str">"dueDate"</span>: { <span class="str">"$lt"</span>: <span class="str">"$$NOW"</span> } } },
+      { <span class="str">"$count"</span>: <span class="str">"n"</span> }
+    ],
+    <span class="str">"totalFine"</span>:     [
+      { <span class="str">"$group"</span>: { <span class="str">"_id"</span>: <span class="kw">null</span>, <span class="str">"sum"</span>: { <span class="str">"$sum"</span>: <span class="str">"$fine"</span> } } }
+    ]
+  }}
+]</div>
+  </div>
+</div>
+
+<!-- ── 11 ── -->
+<div class="section" id="s11">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Security</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Concern</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Password storage</td><td>bcrypt via passlib; work factor ≥ 12; no plaintext ever stored or logged</td></tr>
+        <tr><td>Token security</td><td>HS256 JWT; SECRET_KEY min 32 random chars from <code>.env</code>; 24h expiry</td></tr>
+        <tr><td>CORS</td><td>FastAPI CORSMiddleware; allowed origins restricted to frontend URL in production</td></tr>
+        <tr><td>Input validation</td><td>All request bodies validated with Pydantic v2; automatic 422 on schema mismatch</td></tr>
+        <tr><td>Role escalation</td><td><code>/register</code> hardcodes <code>role = "student"</code>; admin seeded separately</td></tr>
+        <tr><td>ObjectId injection</td><td>All IDs validated as valid ObjectId before DB query; 422 on invalid format</td></tr>
+        <tr><td>Environment secrets</td><td><code>.env</code> listed in <code>.gitignore</code>; never committed; passed via env in production</td></tr>
+        <tr><td>Fine tampering</td><td>Fine calculated server-side only; never accepted from client</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">Required .env Variables</h3>
+    <div class="code-block">
+MONGO_URI=mongodb://localhost:27017
+DB_NAME=library_db
+SECRET_KEY=your-random-32-plus-char-secret-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440   <span class="comment"># 24 hours</span>
+ADMIN_EMAIL=admin@library.edu
+ADMIN_PASSWORD=change-me-on-first-boot</div>
+  </div>
+</div>
+
+<!-- ── 12 ── -->
+<div class="section" id="s12">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Non-Functional Requirements</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Category</th><th>Requirement</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Performance</td><td>API response time (P95)</td><td>&lt; 200ms for CRUD, &lt; 500ms for aggregations</td></tr>
+        <tr><td>Availability</td><td>Backend uptime</td><td>≥ 99.5% (excludes planned maintenance)</td></tr>
+        <tr><td>Scalability</td><td>Concurrent users</td><td>≥ 100 concurrent without degradation (uvicorn + async)</td></tr>
+        <tr><td>Maintainability</td><td>Code coverage</td><td>≥ 70% unit test coverage on controllers</td></tr>
+        <tr><td>Usability</td><td>Responsive layout</td><td>Works on tablet (768px+) and desktop; not optimised for mobile</td></tr>
+        <tr><td>Accessibility</td><td>WCAG 2.1 AA</td><td>Labels, focus states, colour contrast ≥ 4.5:1</td></tr>
+        <tr><td>Logging</td><td>Request logging</td><td>Method, path, status, latency for every request via Python logging</td></tr>
+        <tr><td>API Docs</td><td>OpenAPI/Swagger</td><td>Auto-generated at <code>/docs</code> by FastAPI; kept up-to-date</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── 13 ── -->
+<div class="section" id="s13">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2 class="section-title">Risks &amp; Mitigations</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Risk</th><th>Severity</th><th>Likelihood</th><th>Mitigation</th></tr></thead>
+      <tbody class="risk-high">
+        <tr class="risk-high"><td>Race condition on book issue (two admins issue last copy simultaneously)</td><td>High</td><td>Low</td><td>Use MongoDB <code>findOneAndUpdate</code> with <code>$inc</code> and a condition check; return error if result is null</td></tr>
+        <tr class="risk-high"><td>JWT secret leakage via committed <code>.env</code></td><td>High</td><td>Low</td><td>Add <code>.env</code> to <code>.gitignore</code>; rotate key in production; document in README</td></tr>
+        <tr class="risk-med"><td>studentId collision under high registration load</td><td>Medium</td><td>Low</td><td>Unique index on <code>studentId</code>; retry with incremented counter on duplicate key error</td></tr>
+        <tr class="risk-med"><td>MongoDB connection pool exhaustion</td><td>Medium</td><td>Medium</td><td>Motor manages pool; tune <code>maxPoolSize</code> in connection string for production</td></tr>
+        <tr class="risk-low"><td>Stale <code>availableCopies</code> in frontend cache</td><td>Low</td><td>Medium</td><td>Always fetch fresh data before issue flow; no client-side caching of stock counts</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── 14 ── -->
+<div class="section" id="s14">
+  <div class="section-header">
+    <span class="section-num">14</span>
+    <h2 class="section-title">Implementation Roadmap</h2>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-phase">
+      <div class="timeline-label">Week 1–2</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar ph-1">Phase 1 — Foundation</div>
+        <div class="timeline-tasks">FastAPI project scaffold · Motor DB connection · .env setup · Admin seed script · JWT auth endpoints (register + login) · Pydantic schemas</div>
+      </div>
+    </div>
+    <div class="timeline-phase">
+      <div class="timeline-label">Week 3–4</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar ph-2">Phase 2 — Core APIs</div>
+        <div class="timeline-tasks">Book CRUD endpoints · Student CRUD endpoints · Issue transaction endpoint · Return endpoint with fine logic · Dashboard aggregation</div>
+      </div>
+    </div>
+    <div class="timeline-phase">
+      <div class="timeline-label">Week 5–6</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar ph-3">Phase 3 — Frontend</div>
+        <div class="timeline-tasks">Vite React setup · Axios instance · Login + Register pages · Protected routes · Sidebar component · Dashboard page</div>
+      </div>
+    </div>
+    <div class="timeline-phase">
+      <div class="timeline-label">Week 7–8</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar ph-4">Phase 4 — Admin Features</div>
+        <div class="timeline-tasks">Book management page · Student management page · Issue Book flow · Return Book flow · Fine modal · Toast notifications</div>
+      </div>
+    </div>
+    <div class="timeline-phase">
+      <div class="timeline-label">Week 9–10</div>
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar ph-5">Phase 5 — QA & Polish</div>
+        <div class="timeline-tasks">Unit tests for controllers · Integration tests for API · Responsive layout fixes · Security audit · Deployment docs · README</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-accent" style="margin-top:32px;">
+    <div class="callout-title">Definition of Done</div>
+    <p>All API endpoints documented in OpenAPI · All admin flows functional end-to-end · Passwords never logged or returned · Fine calculation verified with overdue test cases · All routes protected by appropriate middleware · <code>.env.example</code> committed with all required variables listed (values redacted)</p>
+  </div>
+</div>
+
+</div><!-- /doc -->
+
+<footer>
+  <span>Library Management System · PRD v1.0</span>
+  <span>FastAPI · React · MongoDB · JWT</span>
+  <span>Confidential — Internal Engineering</span>
+</footer>
+
+</body>
+</html>
