@@ -29,7 +29,13 @@ const Register = () => {
       await api.post('/auth/register', formData);
       navigate('/login', { state: { message: 'Registration successful! Please login.' } });
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      console.error('Registration error:', err);
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail[0]?.msg || 'Validation error');
+      } else {
+        setError(detail || 'Registration failed. Please check your connection or try again later.');
+      }
     } finally {
       setLoading(false);
     }
